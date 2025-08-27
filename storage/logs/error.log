@@ -1,0 +1,290 @@
+2025-08-27 09:48:29 - Error: Error: Unknown column 'o.payment_code' in 'field list'<br/>Error No: 1054<br/>SELECT 
+                    CASE 
+                        WHEN o.payment_method IS NOT NULL AND o.payment_method <> '' THEN o.payment_method 
+                        WHEN o.payment_code IS NOT NULL AND o.payment_code <> '' THEN o.payment_code 
+                        ELSE 'Unknown' 
+                    END AS name,
+                    SUM(o.total) AS total 
+                FROM `oc_order` o 
+                WHERE DATE(o.date_added) BETWEEN '' AND '' 
+                  AND o.order_status_id > 0 
+                GROUP BY name 
+                ORDER BY total DESC 
+                LIMIT 10
+File: C:\xampp\htdocs\opencart4\upload\system\library\db\mysqli.php
+Line: 122
+
+Backtrace: 0
+File: C:\xampp\htdocs\opencart4\upload\system\library\db.php
+Line: 54
+Class: Opencart\System\Library\DB\MySQLi
+Function: query
+
+Backtrace: 1
+File: C:\xampp\htdocs\opencart4\upload\adminstat\controller\report\sales.php
+Line: 200
+Class: Opencart\System\Library\DB
+Function: query
+
+Backtrace: 2
+File: C:\xampp\htdocs\opencart4\upload\system\engine\action.php
+Line: 96
+Class: Opencart\Admin\Controller\Report\Sales
+Function: topPayments
+
+Backtrace: 3
+File: C:\xampp\htdocs\opencart4\upload\system\framework.php
+Line: 259
+Class: Opencart\System\Engine\Action
+Function: execute
+
+Backtrace: 4
+File: C:\xampp\htdocs\opencart4\upload\adminstat\index.php
+Line: 20
+Function: require_once
+2025-08-27 09:50:55 - Error: Error: Unknown column 'o.payment_code' in 'field list'<br/>Error No: 1054<br/>SELECT 
+                    CASE 
+                        WHEN o.payment_method IS NOT NULL AND o.payment_method <> '' THEN o.payment_method 
+                        WHEN o.payment_code IS NOT NULL AND o.payment_code <> '' THEN o.payment_code 
+                        ELSE 'Unknown' 
+                    END AS name,
+                    SUM(o.total) AS total 
+                FROM `oc_order` o 
+                WHERE DATE(o.date_added) BETWEEN '' AND '' 
+                  AND o.order_status_id > 0 
+                GROUP BY name 
+                ORDER BY total DESC 
+                LIMIT 10
+File: C:\xampp\htdocs\opencart4\upload\system\library\db\mysqli.php
+Line: 122
+
+Backtrace: 0
+File: C:\xampp\htdocs\opencart4\upload\system\library\db.php
+Line: 54
+Class: Opencart\System\Library\DB\MySQLi
+Function: query
+
+Backtrace: 1
+File: C:\xampp\htdocs\opencart4\upload\adminstat\controller\report\sales.php
+Line: 200
+Class: Opencart\System\Library\DB
+Function: query
+
+Backtrace: 2
+File: C:\xampp\htdocs\opencart4\upload\system\engine\action.php
+Line: 96
+Class: Opencart\Admin\Controller\Report\Sales
+Function: topPayments
+
+Backtrace: 3
+File: C:\xampp\htdocs\opencart4\upload\system\framework.php
+Line: 259
+Class: Opencart\System\Engine\Action
+Function: execute
+
+Backtrace: 4
+File: C:\xampp\htdocs\opencart4\upload\adminstat\index.php
+Line: 20
+Function: require_once
+2025-08-27 09:50:58 - Error: Error: Unknown column 'o.payment_code' in 'field list'<br/>Error No: 1054<br/>SELECT 
+                    CASE 
+                        WHEN o.payment_method IS NOT NULL AND o.payment_method <> '' THEN o.payment_method 
+                        WHEN o.payment_code IS NOT NULL AND o.payment_code <> '' THEN o.payment_code 
+                        ELSE 'Unknown' 
+                    END AS name,
+                    SUM(o.total) AS total 
+                FROM `oc_order` o 
+                WHERE DATE(o.date_added) BETWEEN '' AND '' 
+                  AND o.order_status_id > 0 
+                GROUP BY name 
+                ORDER BY total DESC 
+                LIMIT 10
+File: C:\xampp\htdocs\opencart4\upload\system\library\db\mysqli.php
+Line: 122
+
+Backtrace: 0
+File: C:\xampp\htdocs\opencart4\upload\system\library\db.php
+Line: 54
+Class: Opencart\System\Library\DB\MySQLi
+Function: query
+
+Backtrace: 1
+File: C:\xampp\htdocs\opencart4\upload\adminstat\controller\report\sales.php
+Line: 200
+Class: Opencart\System\Library\DB
+Function: query
+
+Backtrace: 2
+File: C:\xampp\htdocs\opencart4\upload\system\engine\action.php
+Line: 96
+Class: Opencart\Admin\Controller\Report\Sales
+Function: topPayments
+
+Backtrace: 3
+File: C:\xampp\htdocs\opencart4\upload\system\framework.php
+Line: 259
+Class: Opencart\System\Engine\Action
+Function: execute
+
+Backtrace: 4
+File: C:\xampp\htdocs\opencart4\upload\adminstat\index.php
+Line: 20
+Function: require_once
+2025-08-27 09:50:59 - Error: Error: Unknown column 'o.payment_code' in 'field list'<br/>Error No: 1054<br/>SELECT 
+                    CASE 
+                        WHEN o.payment_method IS NOT NULL AND o.payment_method <> '' THEN o.payment_method 
+                        WHEN o.payment_code IS NOT NULL AND o.payment_code <> '' THEN o.payment_code 
+                        ELSE 'Unknown' 
+                    END AS name,
+                    SUM(o.total) AS total 
+                FROM `oc_order` o 
+                WHERE DATE(o.date_added) BETWEEN '' AND '' 
+                  AND o.order_status_id > 0 
+                GROUP BY name 
+                ORDER BY total DESC 
+                LIMIT 10
+File: C:\xampp\htdocs\opencart4\upload\system\library\db\mysqli.php
+Line: 122
+
+Backtrace: 0
+File: C:\xampp\htdocs\opencart4\upload\system\library\db.php
+Line: 54
+Class: Opencart\System\Library\DB\MySQLi
+Function: query
+
+Backtrace: 1
+File: C:\xampp\htdocs\opencart4\upload\adminstat\controller\report\sales.php
+Line: 200
+Class: Opencart\System\Library\DB
+Function: query
+
+Backtrace: 2
+File: C:\xampp\htdocs\opencart4\upload\system\engine\action.php
+Line: 96
+Class: Opencart\Admin\Controller\Report\Sales
+Function: topPayments
+
+Backtrace: 3
+File: C:\xampp\htdocs\opencart4\upload\system\framework.php
+Line: 259
+Class: Opencart\System\Engine\Action
+Function: execute
+
+Backtrace: 4
+File: C:\xampp\htdocs\opencart4\upload\adminstat\index.php
+Line: 20
+Function: require_once
+2025-08-27 09:54:44 - Error: Error: Unknown column 'o.payment_code' in 'field list'<br/>Error No: 1054<br/>SELECT COALESCE(NULLIF(JSON_UNQUOTE(JSON_EXTRACT(o.payment_method, '$.name')), ''), NULLIF(JSON_UNQUOTE(JSON_EXTRACT(o.payment_method, '$.code')), ''), NULLIF(o.payment_code, ''), NULLIF(o.payment_method, ''), 'Unknown') AS name, SUM(o.total) AS total
+                FROM `oc_order` o
+                WHERE DATE(o.date_added) BETWEEN '' AND ''
+                  AND o.order_status_id > 0
+                GROUP BY name
+                ORDER BY total DESC
+                LIMIT 10
+File: C:\xampp\htdocs\opencart4\upload\system\library\db\mysqli.php
+Line: 122
+
+Backtrace: 0
+File: C:\xampp\htdocs\opencart4\upload\system\library\db.php
+Line: 54
+Class: Opencart\System\Library\DB\MySQLi
+Function: query
+
+Backtrace: 1
+File: C:\xampp\htdocs\opencart4\upload\adminstat\controller\report\sales.php
+Line: 196
+Class: Opencart\System\Library\DB
+Function: query
+
+Backtrace: 2
+File: C:\xampp\htdocs\opencart4\upload\system\engine\action.php
+Line: 96
+Class: Opencart\Admin\Controller\Report\Sales
+Function: topPayments
+
+Backtrace: 3
+File: C:\xampp\htdocs\opencart4\upload\system\framework.php
+Line: 259
+Class: Opencart\System\Engine\Action
+Function: execute
+
+Backtrace: 4
+File: C:\xampp\htdocs\opencart4\upload\adminstat\index.php
+Line: 20
+Function: require_once
+2025-08-27 09:56:16 - Error: Error: Unknown column 'o.payment_code' in 'field list'<br/>Error No: 1054<br/>SELECT COALESCE(NULLIF(JSON_UNQUOTE(JSON_EXTRACT(o.payment_method, '$.name')), ''), NULLIF(JSON_UNQUOTE(JSON_EXTRACT(o.payment_method, '$.code')), ''), NULLIF(o.payment_code, ''), NULLIF(o.payment_method, ''), 'Unknown') AS name, SUM(o.total) AS total
+                FROM `oc_order` o
+                WHERE DATE(o.date_added) BETWEEN '' AND ''
+                  AND o.order_status_id > 0
+                GROUP BY name
+                ORDER BY total DESC
+                LIMIT 10
+File: C:\xampp\htdocs\opencart4\upload\system\library\db\mysqli.php
+Line: 122
+
+Backtrace: 0
+File: C:\xampp\htdocs\opencart4\upload\system\library\db.php
+Line: 54
+Class: Opencart\System\Library\DB\MySQLi
+Function: query
+
+Backtrace: 1
+File: C:\xampp\htdocs\opencart4\upload\adminstat\controller\report\sales.php
+Line: 196
+Class: Opencart\System\Library\DB
+Function: query
+
+Backtrace: 2
+File: C:\xampp\htdocs\opencart4\upload\system\engine\action.php
+Line: 96
+Class: Opencart\Admin\Controller\Report\Sales
+Function: topPayments
+
+Backtrace: 3
+File: C:\xampp\htdocs\opencart4\upload\system\framework.php
+Line: 259
+Class: Opencart\System\Engine\Action
+Function: execute
+
+Backtrace: 4
+File: C:\xampp\htdocs\opencart4\upload\adminstat\index.php
+Line: 20
+Function: require_once
+2025-08-27 09:56:33 - Error: Error: Unknown column 'o.payment_code' in 'field list'<br/>Error No: 1054<br/>SELECT COALESCE(NULLIF(JSON_UNQUOTE(JSON_EXTRACT(o.payment_method, '$.name')), ''), NULLIF(JSON_UNQUOTE(JSON_EXTRACT(o.payment_method, '$.code')), ''), NULLIF(o.payment_code, ''), NULLIF(o.payment_method, ''), 'Unknown') AS name, SUM(o.total) AS total
+                FROM `oc_order` o
+                WHERE DATE(o.date_added) BETWEEN '' AND ''
+                  AND o.order_status_id > 0
+                GROUP BY name
+                ORDER BY total DESC
+                LIMIT 10
+File: C:\xampp\htdocs\opencart4\upload\system\library\db\mysqli.php
+Line: 122
+
+Backtrace: 0
+File: C:\xampp\htdocs\opencart4\upload\system\library\db.php
+Line: 54
+Class: Opencart\System\Library\DB\MySQLi
+Function: query
+
+Backtrace: 1
+File: C:\xampp\htdocs\opencart4\upload\adminstat\controller\report\sales.php
+Line: 196
+Class: Opencart\System\Library\DB
+Function: query
+
+Backtrace: 2
+File: C:\xampp\htdocs\opencart4\upload\system\engine\action.php
+Line: 96
+Class: Opencart\Admin\Controller\Report\Sales
+Function: topPayments
+
+Backtrace: 3
+File: C:\xampp\htdocs\opencart4\upload\system\framework.php
+Line: 259
+Class: Opencart\System\Engine\Action
+Function: execute
+
+Backtrace: 4
+File: C:\xampp\htdocs\opencart4\upload\adminstat\index.php
+Line: 20
+Function: require_once

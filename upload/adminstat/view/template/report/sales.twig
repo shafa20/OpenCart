@@ -1,0 +1,102 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <form id="filter-form" class="float-end d-flex gap-2 align-items-center">
+        <input type="date" name="date_start" value="{{ date_start }}" class="form-control form-control-sm" />
+        <input type="date" name="date_end" value="{{ date_end }}" class="form-control form-control-sm" />
+        <button type="submit" class="btn btn-primary btn-sm">{{ button_filter }}</button>
+        <button type="button" id="button-refresh" data-bs-toggle="tooltip" title="{{ button_refresh }}" class="btn btn-light btn-sm">
+          <i class="fa-solid fa-rotate"></i>
+        </button>
+      </form>
+      <h1>{{ heading_title }}</h1>
+      <ol class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="text-muted small">{{ text_total_sales }}</div>
+                <div class="fw-bold fs-4" id="kpi-total">{{ kpi_revenue_formatted }}</div>
+              </div>
+              <i class="fa-solid fa-sack-dollar fa-2x text-primary"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="text-muted small">Orders</div>
+            <div class="fw-bold fs-4">{{ kpi_orders }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="text-muted small">Average Order Value</div>
+            <div class="fw-bold fs-4">{{ kpi_aov_formatted }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-8">
+        <div class="card">
+          <div class="card-body">
+            <canvas id="salesChart" height="100" data-chart-url="{{ chart_url }}"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-md-6">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>{{ text_refunds }}</span>
+            <a href="#" class="small text-decoration-none">View Details</a>
+          </div>
+          <div class="card-body">
+            <canvas id="refundsChart" height="120" data-chart-url="{{ refunds_chart_url }}"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>{{ text_top_payment_methods }}</span>
+            <a href="#" class="small text-decoration-none">View Details</a>
+          </div>
+          <div class="card-body">
+            <div id="topPayments" data-url="{{ top_payments_url }}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script type="text/javascript">
+  (function() {
+    document.getElementById('filter-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const params = new URLSearchParams(window.location.search);
+      params.set('date_start', this.date_start.value);
+      params.set('date_end', this.date_end.value);
+      window.location = window.location.pathname + '?' + params.toString();
+    });
+  })();
+</script>
+{{ footer }}

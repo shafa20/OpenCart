@@ -792,6 +792,34 @@ class ColumnLeft extends \Opencart\System\Engine\Controller {
 					'children' => []
 				];
 			}
+			/* 🔹 Add new submenu items */
+
+			// Sales Report
+			if ($this->user->hasPermission('access', 'report/sales')) {
+				$report[] = [
+					'name'     => 'Sales Report',
+					'href'     => $this->url->link('report/sales', 'user_token=' . $this->session->data['user_token']),
+					'children' => []
+				];
+			}
+
+			// Customer Report
+			if ($this->user->hasPermission('access', 'report/customers')) {
+				$report[] = [
+					'name'     => 'Customer Report',
+					'href'     => $this->url->link('report/customers', 'user_token=' . $this->session->data['user_token']),
+					'children' => []
+				];
+			}
+
+			// Product Report
+			if ($this->user->hasPermission('access', 'report/products')) {
+				$report[] = [
+					'name'     => 'Product Report',
+					'href'     => $this->url->link('report/products', 'user_token=' . $this->session->data['user_token']),
+					'children' => []
+				];
+			}
 
 			if ($report) {
 				$data['menus'][] = [
