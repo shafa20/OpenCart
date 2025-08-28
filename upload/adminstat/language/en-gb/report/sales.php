@@ -16,3 +16,5 @@ $_['button_filter'] = 'Filter';
 $_['button_refresh'] = 'Refresh';
 $_['entry_date_start'] = 'Date Start';
 $_['entry_date_end'] = 'Date End';
+$_['column_payment_method'] = 'Payment Method';
+

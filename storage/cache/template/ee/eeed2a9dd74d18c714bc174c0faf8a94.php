@@ -182,9 +182,14 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
         // line 76
         yield ($context["text_top_payment_methods"] ?? null);
         yield "</span>
-            <a href=\"#\" class=\"small text-decoration-none\">View Details</a>
+            <a href=\"";
+        // line 77
+        yield ($context["payments_details_url"] ?? null);
+        yield "\" class=\"small text-decoration-none\">";
+        yield ($context["text_view_details"] ?? null);
+        yield "</a>
           </div>
-          <div class=\"card-body\">
+          <div class=\"card-body\" style=\"min-height: 150px;\">
             <div id=\"topPayments\" data-url=\"";
         // line 80
         yield ($context["top_payments_url"] ?? null);
@@ -240,7 +245,7 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  216 => 103,  190 => 80,  183 => 76,  173 => 69,  167 => 66,  163 => 65,  156 => 60,  149 => 55,  138 => 47,  126 => 38,  118 => 33,  114 => 32,  104 => 27,  100 => 26,  90 => 18,  79 => 16,  75 => 15,  70 => 13,  63 => 9,  59 => 8,  55 => 7,  51 => 6,  42 => 1,);
+        return array (  221 => 103,  195 => 80,  187 => 77,  183 => 76,  173 => 69,  167 => 66,  163 => 65,  156 => 60,  149 => 55,  138 => 47,  126 => 38,  118 => 33,  114 => 32,  104 => 27,  100 => 26,  90 => 18,  79 => 16,  75 => 15,  70 => 13,  63 => 9,  59 => 8,  55 => 7,  51 => 6,  42 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -321,9 +326,9 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
         <div class=\"card\">
           <div class=\"card-header d-flex justify-content-between align-items-center\">
             <span>{{ text_top_payment_methods }}</span>
-            <a href=\"#\" class=\"small text-decoration-none\">View Details</a>
+            <a href=\"{{ payments_details_url }}\" class=\"small text-decoration-none\">{{ text_view_details }}</a>
           </div>
-          <div class=\"card-body\">
+          <div class=\"card-body\" style=\"min-height: 150px;\">
             <div id=\"topPayments\" data-url=\"{{ top_payments_url }}\"></div>
           </div>
         </div>

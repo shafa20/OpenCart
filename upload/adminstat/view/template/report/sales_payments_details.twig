@@ -1,0 +1,105 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <h1>{{ heading_title }}</h1>
+      <ol class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <span class="fw-semibold">{{ text_top_payment_methods }}</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <input type="date" id="input-date-start" class="form-control form-control-sm" value="{{ date_start }}">
+          <input type="date" id="input-date-end" class="form-control form-control-sm" value="{{ date_end }}">
+          <button id="button-apply" class="btn btn-primary btn-sm">{{ button_filter }}</button>
+          <a class="btn btn-light btn-sm" href="{{ back_url }}">{{ text_back }}</a>
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">{{ text_export }}</button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" id="link-export-csv" href="{{ export_csv_url }}">CSV</a></li>
+              <li><a class="dropdown-item" id="link-export-xls" href="{{ export_xls_url }}">XLS</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>{{ column_interval }}</th>
+                <th class="text-end">{{ column_orders }}</th>
+                <th class="text-end">{{ column_total }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if rows %}
+                {% for row in rows %}
+                  <tr>
+                    <td>{{ row.label }}</td>
+                    <td class="text-end">{{ row.orders }}</td>
+                    <td class="text-end">{{ row.total }}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="3" class="text-center text-muted p-4">No data</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+(function(){
+  const qs = new URLSearchParams(window.location.search);
+  const btnApply = document.getElementById('button-apply');
+  const dateStart = document.getElementById('input-date-start');
+  const dateEnd = document.getElementById('input-date-end');
+  const linkCsv = document.getElementById('link-export-csv');
+  const linkXls = document.getElementById('link-export-xls');
+
+  function rebuildUrls(){
+    const params = new URLSearchParams({
+      route: 'report/sales|detailsPayments',
+      user_token: qs.get('user_token'),
+      date_start: dateStart.value,
+      date_end: dateEnd.value
+    });
+    return window.location.pathname + '?' + params.toString();
+  }
+
+  function buildExportUrl(kind){
+    const params = new URLSearchParams({
+      user_token: qs.get('user_token'),
+      date_start: dateStart.value,
+      date_end: dateEnd.value
+    });
+    const route = kind === 'csv' ? 'report/sales|exportPaymentsCsv' : 'report/sales|exportPaymentsXls';
+    return window.location.pathname + '?' + 'route=' + route + '&' + params.toString();
+  }
+
+  btnApply.addEventListener('click', function(){
+    window.location = rebuildUrls();
+  });
+
+  function refreshExportLinks(){
+    linkCsv.href = buildExportUrl('csv');
+    linkXls.href = buildExportUrl('xls');
+  }
+  refreshExportLinks();
+})();
+</script>
+{{ footer }}

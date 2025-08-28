@@ -39,6 +39,8 @@ class Sales extends \Opencart\System\Engine\Controller {
         $data['chart_url'] = $this->url->link('report/sales|chart', $query_string);
         $data['refunds_chart_url'] = $this->url->link('report/sales|refundsChart', $query_string);
         $data['top_payments_url'] = $this->url->link('report/sales|topPayments', $query_string);
+        // Payments details page URL
+        $data['payments_details_url'] = $this->url->link('report/sales|detailsPayments', $query_string);
 
         // Filters (defaults last 30 days)
         $date_end = $this->request->get['date_end'] ?? date('Y-m-d');
@@ -170,6 +172,126 @@ class Sales extends \Opencart\System\Engine\Controller {
             'href' => $this->url->link('report/sales', 'user_token=' . $this->session->data['user_token'])
         ];
         $this->response->setOutput($this->load->view('report/sales_details', $data));
+    }
+
+    /**
+     * Details page: Top payment methods within selected range (no interval selector)
+     */
+    public function detailsPayments(): void {
+        $this->load->language('report/sales');
+
+        $date_end = $this->request->get['date_end'] ?? date('Y-m-d');
+        $date_start = $this->request->get['date_start'] ?? date('Y-m-d', strtotime('-29 days', strtotime($date_end)));
+
+        $data['date_start'] = $date_start;
+        $data['date_end'] = $date_end;
+
+        // Query aggregated by normalized payment method name
+        $prefix = DB_PREFIX;
+        $sql = "SELECT 
+                    CASE 
+                        WHEN JSON_VALID(o.payment_method) THEN JSON_UNQUOTE(JSON_EXTRACT(o.payment_method, '$.name'))
+                        ELSE o.payment_method
+                    END AS name,
+                    COUNT(*) AS orders,
+                    SUM(o.total) AS total
+                FROM `{$prefix}order` o 
+                WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "'
+                  AND o.order_status_id > 0
+                GROUP BY name
+                ORDER BY total DESC";
+
+        $rows = $this->db->query($sql)->rows;
+
+        $currency_code = $this->config->get('config_currency');
+        $data['rows'] = [];
+        foreach ($rows as $r) {
+            $label = ($r['name'] ?? '') !== '' ? $r['name'] : 'Unknown';
+            $data['rows'][] = [
+                'label'  => $label,
+                'orders' => (int)$r['orders'],
+                'total'  => $this->currency->format((float)$r['total'], $currency_code)
+            ];
+        }
+
+        // Column titles (reuse existing keys where possible)
+        $data['column_interval'] = $this->language->get('column_payment_method') ?? 'Payment Method';
+        $data['column_orders'] = $this->language->get('column_orders') ?? 'Orders';
+        $data['column_total'] = $this->language->get('column_total') ?? 'Total';
+
+        // Links
+        $qs = 'user_token=' . $this->session->data['user_token'] . '&date_start=' . urlencode($date_start) . '&date_end=' . urlencode($date_end);
+        $data['export_csv_url'] = $this->url->link('report/sales|exportPaymentsCsv', $qs);
+        $data['export_xls_url'] = $this->url->link('report/sales|exportPaymentsXls', $qs);
+        $data['back_url'] = $this->url->link('report/sales', 'user_token=' . $this->session->data['user_token'] . '&date_start=' . urlencode($date_start) . '&date_end=' . urlencode($date_end));
+
+        // Common layout
+        $data['header'] = $this->load->controller('common/header');
+        $data['column_left'] = $this->load->controller('common/column_left');
+        $data['footer'] = $this->load->controller('common/footer');
+        $data['breadcrumbs'] = [];
+        $data['breadcrumbs'][] = [
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
+        ];
+        $data['breadcrumbs'][] = [
+            'text' => $this->language->get('heading_title'),
+            'href' => $this->url->link('report/sales', 'user_token=' . $this->session->data['user_token'])
+        ];
+
+        $this->response->setOutput($this->load->view('report/sales_payments_details', $data));
+    }
+
+    /** Export CSV for payment methods details */
+    public function exportPaymentsCsv(): void { $this->exportPaymentsCommon('csv'); }
+    /** Export XLS (TSV) for payment methods details */
+    public function exportPaymentsXls(): void { $this->exportPaymentsCommon('xls'); }
+
+    protected function exportPaymentsCommon(string $type): void {
+        $date_end = $this->request->get['date_end'] ?? date('Y-m-d');
+        $date_start = $this->request->get['date_start'] ?? date('Y-m-d', strtotime('-29 days', strtotime($date_end)));
+
+        $prefix = DB_PREFIX;
+        $sql = "SELECT 
+                    CASE 
+                        WHEN JSON_VALID(o.payment_method) THEN JSON_UNQUOTE(JSON_EXTRACT(o.payment_method, '$.name'))
+                        ELSE o.payment_method
+                    END AS name,
+                    COUNT(*) AS orders,
+                    SUM(o.total) AS total
+                FROM `{$prefix}order` o 
+                WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "'
+                  AND o.order_status_id > 0
+                GROUP BY name
+                ORDER BY total DESC";
+        $rows = $this->db->query($sql)->rows;
+
+        $currency_code = $this->config->get('config_currency');
+        $filename = 'sales_payments_' . $date_start . '_' . $date_end . '.' . ($type === 'csv' ? 'csv' : 'xls');
+        if ($type === 'csv') {
+            $this->response->addHeader('Content-Type: text/csv; charset=UTF-8');
+        } else {
+            $this->response->addHeader('Content-Type: application/vnd.ms-excel; charset=UTF-8');
+        }
+        $this->response->addHeader('Content-Disposition: attachment; filename=' . $filename);
+
+        $out = fopen('php://temp', 'w+');
+        // header row
+        fputcsv($out, ['Payment Method', 'Orders', 'Total']);
+        foreach ($rows as $r) {
+            $label = ($r['name'] ?? '') !== '' ? $r['name'] : 'Unknown';
+            $orders = (int)$r['orders'];
+            $total = $this->currency->format((float)$r['total'], $currency_code);
+            $line = [$label, $orders, $total];
+            if ($type === 'csv') {
+                fputcsv($out, $line);
+            } else {
+                fwrite($out, implode("\t", $line) . "\r\n");
+            }
+        }
+        rewind($out);
+        $this->response->setOutput(stream_get_contents($out));
+        fclose($out);
     }
 
     /** Export CSV for details table */
@@ -357,7 +479,20 @@ class Sales extends \Opencart\System\Engine\Controller {
         $date_start = $this->request->get['date_start'] ?? date('Y-m-d', strtotime('-29 days', strtotime($date_end)));
 
         $prefix = DB_PREFIX;
-        $sql = "SELECT o.payment_method AS name, SUM(o.total) AS total FROM `{$prefix}order` o WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "' AND o.order_status_id > 0 GROUP BY o.payment_method ORDER BY total DESC LIMIT 10";
+        // Some installations store payment_method as JSON like {"code":"cod.cod","name":"Cash On Delivery"}.
+        // Normalize to the human-readable name and group by it to avoid duplicates.
+        $sql = "SELECT 
+                    CASE 
+                        WHEN JSON_VALID(o.payment_method) THEN JSON_UNQUOTE(JSON_EXTRACT(o.payment_method, '$.name'))
+                        ELSE o.payment_method
+                    END AS name,
+                    SUM(o.total) AS total
+                FROM `{$prefix}order` o 
+                WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "' 
+                  AND o.order_status_id > 0 
+                GROUP BY name 
+                ORDER BY total DESC 
+                LIMIT 10";
         $rows = $this->db->query($sql)->rows;
 
         // Format currency in controller for consistency
@@ -365,7 +500,7 @@ class Sales extends \Opencart\System\Engine\Controller {
         $list = [];
         foreach ($rows as $r) {
             $list[] = [
-                'name' => $r['name'] ?: 'Unknown',
+                'name' => ($r['name'] ?? '') !== '' ? $r['name'] : 'Unknown',
                 'total' => (float)$r['total'],
                 'total_formatted' => $this->currency->format((float)$r['total'], $currency_code)
             ];
