@@ -98,20 +98,7 @@ class Sales extends \Opencart\System\Engine\Controller {
         $interval = strtolower($this->request->get['interval'] ?? 'day'); // day|month|year
         if (!in_array($interval, ['day', 'month', 'year'], true)) $interval = 'day';
 
-        $data['heading_title'] = $this->language->get('heading_title');
-        $data['text_total_sales'] = $this->language->get('text_total_sales');
-        $data['text_view_details'] = $this->language->get('text_view_details') ?? 'View Details';
-        $data['text_export'] = $this->language->get('text_export') ?? 'Export';
-        $data['text_back'] = $this->language->get('text_back') ?? 'Back';
-        $data['text_day'] = $this->language->get('text_day') ?? 'Day';
-        $data['text_month'] = $this->language->get('text_month') ?? 'Month';
-        $data['text_year'] = $this->language->get('text_year') ?? 'Year';
-        $data['column_interval'] = $this->language->get('column_interval') ?? 'Interval';
-        $data['column_orders'] = $this->language->get('column_orders') ?? 'Orders';
-        $data['column_total'] = $this->language->get('column_total') ?? 'Total';
-        $data['button_filter'] = $this->language->get('button_filter');
-        $data['entry_date_start'] = $this->language->get('entry_date_start');
-        $data['entry_date_end'] = $this->language->get('entry_date_end');
+       
 
         $data['date_start'] = $date_start;
         $data['date_end'] = $date_end;
