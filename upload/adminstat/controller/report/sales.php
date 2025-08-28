@@ -14,6 +14,12 @@ class Sales extends \Opencart\System\Engine\Controller {
         $data['button_refresh'] = $this->language->get('button_refresh');
         $data['entry_date_start'] = $this->language->get('entry_date_start');
         $data['entry_date_end'] = $this->language->get('entry_date_end');
+        // Texts used in Twig cards/headers
+        $data['text_total_sales'] = $this->language->get('text_total_sales');
+        $data['text_refunds'] = $this->language->get('text_refunds');
+        $data['text_top_payment_methods'] = $this->language->get('text_top_payment_methods');
+        $data['text_view_details'] = $this->language->get('text_view_details') ?? 'View Details';
+
 
         // Breadcrumbs
         $data['breadcrumbs'] = [];
@@ -59,8 +65,15 @@ class Sales extends \Opencart\System\Engine\Controller {
         $data['kpi_revenue_formatted'] = $this->currency->format($data['kpi_revenue'], $currency_code);
         $data['kpi_aov_formatted'] = $this->currency->format($data['kpi_aov'], $currency_code);
 
-        // Include scripts (Chart.js vendor + page script)
-        $this->document->addScript('view/javascript/vendor/chart.umd.min.js');
+        // Overall total revenue (for percentage comparison against filtered)
+        $overall = $this->db->query("SELECT SUM(o.total) AS revenue FROM `{$prefix}order` o WHERE o.order_status_id > 0");
+        $overall_revenue = (float)($overall->row['revenue'] ?? 0);
+        $data['kpi_revenue_percent'] = $overall_revenue > 0 ? round(($data['kpi_revenue'] / $overall_revenue) * 100) : 0;
+
+        // View details URL (sales details within selected range)
+        $data['details_url'] = $this->url->link('report/sales|details', 'user_token=' . $this->session->data['user_token'] . '&date_start=' . urlencode($date_start) . '&date_end=' . urlencode($date_end) . '&interval=day');
+
+        // Include page script (Chart.js is loaded via CDN in Twig)
         $this->document->addScript('view/javascript/report/sales.js');
 
         // Common layout
@@ -69,9 +82,183 @@ class Sales extends \Opencart\System\Engine\Controller {
         $data['footer'] = $this->load->controller('common/footer');
         $this->load->model('report/sales');
 
-       
-        
+
+
         $this->response->setOutput($this->load->view('report/sales', $data));
+    }
+
+    /**
+     * Details page: table of totals grouped by day/month/year in selected range
+     */
+    public function details(): void {
+        $this->load->language('report/sales');
+
+        $date_end = $this->request->get['date_end'] ?? date('Y-m-d');
+        $date_start = $this->request->get['date_start'] ?? date('Y-m-d', strtotime('-29 days', strtotime($date_end)));
+        $interval = strtolower($this->request->get['interval'] ?? 'day'); // day|month|year
+        if (!in_array($interval, ['day', 'month', 'year'], true)) $interval = 'day';
+
+        $data['heading_title'] = $this->language->get('heading_title');
+        $data['text_total_sales'] = $this->language->get('text_total_sales');
+        $data['text_view_details'] = $this->language->get('text_view_details') ?? 'View Details';
+        $data['text_export'] = $this->language->get('text_export') ?? 'Export';
+        $data['text_back'] = $this->language->get('text_back') ?? 'Back';
+        $data['text_day'] = $this->language->get('text_day') ?? 'Day';
+        $data['text_month'] = $this->language->get('text_month') ?? 'Month';
+        $data['text_year'] = $this->language->get('text_year') ?? 'Year';
+        $data['column_interval'] = $this->language->get('column_interval') ?? 'Interval';
+        $data['column_orders'] = $this->language->get('column_orders') ?? 'Orders';
+        $data['column_total'] = $this->language->get('column_total') ?? 'Total';
+        $data['button_filter'] = $this->language->get('button_filter');
+        $data['entry_date_start'] = $this->language->get('entry_date_start');
+        $data['entry_date_end'] = $this->language->get('entry_date_end');
+
+        $data['date_start'] = $date_start;
+        $data['date_end'] = $date_end;
+        $data['interval'] = $interval;
+
+        // Build empty period map depending on interval
+        $period = [];
+        $start = strtotime($date_start);
+        $end = strtotime($date_end);
+        $fmt = 'Y-m-d';
+        $step = '+1 day';
+        if ($interval === 'month') { $fmt = 'Y-m'; $step = '+1 month'; }
+        if ($interval === 'year') { $fmt = 'Y'; $step = '+1 year'; }
+        $cursor = strtotime(date($fmt, $start) . ( $interval==='day' ? '' : '-01' ));
+        while ($cursor <= $end) {
+            $key = date($fmt, $cursor);
+            $period[$key] = ['orders' => 0, 'total' => 0.0];
+            $cursor = strtotime($step, $cursor);
+        }
+
+        // Query according to interval
+        $prefix = DB_PREFIX;
+        if ($interval === 'day') {
+            $sql = "SELECT DATE(o.date_added) AS p, COUNT(*) AS orders, SUM(o.total) AS total FROM `{$prefix}order` o WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "' AND o.order_status_id > 0 GROUP BY DATE(o.date_added) ORDER BY p";
+        } elseif ($interval === 'month') {
+            $sql = "SELECT DATE_FORMAT(o.date_added,'%Y-%m') AS p, COUNT(*) AS orders, SUM(o.total) AS total FROM `{$prefix}order` o WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "' AND o.order_status_id > 0 GROUP BY DATE_FORMAT(o.date_added,'%Y-%m') ORDER BY p";
+        } else { // year
+            $sql = "SELECT DATE_FORMAT(o.date_added,'%Y') AS p, COUNT(*) AS orders, SUM(o.total) AS total FROM `{$prefix}order` o WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "' AND o.order_status_id > 0 GROUP BY DATE_FORMAT(o.date_added,'%Y') ORDER BY p";
+        }
+        $rows = $this->db->query($sql)->rows;
+        foreach ($rows as $r) {
+            $k = $r['p'];
+            if (!isset($period[$k])) $period[$k] = ['orders' => 0, 'total' => 0.0];
+            $period[$k]['orders'] = (int)$r['orders'];
+            $period[$k]['total'] = (float)$r['total'];
+        }
+
+        $currency_code = $this->config->get('config_currency');
+        $data['rows'] = [];
+        foreach ($period as $k => $v) {
+            $label = $k;
+            if ($interval === 'day') $label = $k; // YYYY-MM-DD
+            if ($interval === 'month') $label = $k; // YYYY-MM
+            if ($interval === 'year') $label = $k; // YYYY
+            $data['rows'][] = [
+                'label' => $label,
+                'orders' => $v['orders'],
+                'total' => $this->currency->format($v['total'], $currency_code)
+            ];
+        }
+
+        // Links
+        $qs = 'user_token=' . $this->session->data['user_token'] . '&date_start=' . urlencode($date_start) . '&date_end=' . urlencode($date_end) . '&interval=' . $interval;
+        $data['export_csv_url'] = $this->url->link('report/sales|exportCsv', $qs);
+        $data['export_xls_url'] = $this->url->link('report/sales|exportXls', $qs);
+        $data['back_url'] = $this->url->link('report/sales', 'user_token=' . $this->session->data['user_token'] . '&date_start=' . urlencode($date_start) . '&date_end=' . urlencode($date_end));
+
+        // Common layout
+        $data['header'] = $this->load->controller('common/header');
+        $data['column_left'] = $this->load->controller('common/column_left');
+        $data['footer'] = $this->load->controller('common/footer');
+        $data['breadcrumbs'] = [];
+        $data['breadcrumbs'][] = [
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'])
+        ];
+        $data['breadcrumbs'][] = [
+            'text' => $this->language->get('heading_title'),
+            'href' => $this->url->link('report/sales', 'user_token=' . $this->session->data['user_token'])
+        ];
+        $this->response->setOutput($this->load->view('report/sales_details', $data));
+    }
+
+    /** Export CSV for details table */
+    public function exportCsv(): void {
+        $this->exportCommon('csv');
+    }
+
+    /** Export XLS (TSV with Excel mime) for details table */
+    public function exportXls(): void {
+        $this->exportCommon('xls');
+    }
+
+    protected function exportCommon(string $type): void {
+        $date_end = $this->request->get['date_end'] ?? date('Y-m-d');
+        $date_start = $this->request->get['date_start'] ?? date('Y-m-d', strtotime('-29 days', strtotime($date_end)));
+        $interval = strtolower($this->request->get['interval'] ?? 'day');
+        if (!in_array($interval, ['day', 'month', 'year'], true)) $interval = 'day';
+
+        // Build empty period map depending on interval
+        $period = [];
+        $start = strtotime($date_start);
+        $end = strtotime($date_end);
+        $fmt = 'Y-m-d';
+        $step = '+1 day';
+        if ($interval === 'month') { $fmt = 'Y-m'; $step = '+1 month'; }
+        if ($interval === 'year') { $fmt = 'Y'; $step = '+1 year'; }
+        $cursor = strtotime(date($fmt, $start) . ( $interval==='day' ? '' : '-01' ));
+        while ($cursor <= $end) {
+            $key = date($fmt, $cursor);
+            $period[$key] = ['orders' => 0, 'total' => 0.0];
+            $cursor = strtotime($step, $cursor);
+        }
+
+        // Query according to interval
+        $prefix = DB_PREFIX;
+        if ($interval === 'day') {
+            $sql = "SELECT DATE(o.date_added) AS p, COUNT(*) AS orders, SUM(o.total) AS total FROM `{$prefix}order` o WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "' AND o.order_status_id > 0 GROUP BY DATE(o.date_added) ORDER BY p";
+        } elseif ($interval === 'month') {
+            $sql = "SELECT DATE_FORMAT(o.date_added,'%Y-%m') AS p, COUNT(*) AS orders, SUM(o.total) AS total FROM `{$prefix}order` o WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "' AND o.order_status_id > 0 GROUP BY DATE_FORMAT(o.date_added,'%Y-%m') ORDER BY p";
+        } else {
+            $sql = "SELECT DATE_FORMAT(o.date_added,'%Y') AS p, COUNT(*) AS orders, SUM(o.total) AS total FROM `{$prefix}order` o WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "' AND o.order_status_id > 0 GROUP BY DATE_FORMAT(o.date_added,'%Y') ORDER BY p";
+        }
+        $rows = $this->db->query($sql)->rows;
+        foreach ($rows as $r) {
+            $k = $r['p'];
+            if (!isset($period[$k])) $period[$k] = ['orders' => 0, 'total' => 0.0];
+            $period[$k]['orders'] = (int)$r['orders'];
+            $period[$k]['total'] = (float)$r['total'];
+        }
+
+        $currency_code = $this->config->get('config_currency');
+        $filename = 'sales_' . $interval . '_' . $date_start . '_' . $date_end . '.' . ($type === 'csv' ? 'csv' : 'xls');
+        if ($type === 'csv') {
+            $this->response->addHeader('Content-Type: text/csv; charset=UTF-8');
+        } else {
+            $this->response->addHeader('Content-Type: application/vnd.ms-excel; charset=UTF-8');
+        }
+        $this->response->addHeader('Content-Disposition: attachment; filename=' . $filename);
+
+        $out = fopen('php://temp', 'w+');
+        // header row
+        fputcsv($out, ['Interval', 'Orders', 'Total']);
+        foreach ($period as $k => $v) {
+            $label = $k;
+            $orders = $v['orders'];
+            $total = $this->currency->format($v['total'], $currency_code);
+            $line = [$label, $orders, $total];
+            if ($type === 'csv') {
+                fputcsv($out, $line);
+            } else {
+                fwrite($out, implode("\t", $line) . "\r\n");
+            }
+        }
+        rewind($out);
+        $this->response->setOutput(stream_get_contents($out));
+        fclose($out);
     }
 
     /**

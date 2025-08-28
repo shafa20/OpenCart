@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
-        plugins: { legend: { display: true } },
+        plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true } }
       }
     });

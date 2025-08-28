@@ -92,21 +92,39 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
   </div>
   <div class=\"container-fluid\">
     <div class=\"row g-3 mb-3\">
-      <div class=\"col-12 col-md-4\">
+      <div class=\"col-12\">
         <div class=\"card\">
-          <div class=\"card-body\">
-            <div class=\"d-flex justify-content-between align-items-center\">
-              <div>
-                <div class=\"text-muted small\">";
-        // line 28
+          <div class=\"card-header d-flex justify-content-between align-items-center\">
+            <span>";
+        // line 26
         yield ($context["text_total_sales"] ?? null);
-        yield "</div>
-                <div class=\"fw-bold fs-4\" id=\"kpi-total\">";
-        // line 29
+        yield "</span>
+            <a href=\"";
+        // line 27
+        yield ($context["details_url"] ?? null);
+        yield "\" class=\"small text-decoration-none\">";
+        yield ($context["text_view_details"] ?? null);
+        yield "</a>
+          </div>
+          <div class=\"card-body\">
+            <div class=\"d-flex justify-content-between align-items-center mb-3\">
+              <div class=\"d-flex align-items-baseline gap-3\">
+                <div class=\"fw-bold fs-3\" id=\"kpi-total\">";
+        // line 32
         yield ($context["kpi_revenue_formatted"] ?? null);
         yield "</div>
+                <div class=\"text-success fw-semibold\">";
+        // line 33
+        yield ($context["kpi_revenue_percent"] ?? null);
+        yield "%</div>
               </div>
               <i class=\"fa-solid fa-sack-dollar fa-2x text-primary\"></i>
+            </div>
+            <div style=\"height: 350px;\">
+              <canvas id=\"salesChart\" height=\"200\" data-chart-url=\"";
+        // line 38
+        yield ($context["chart_url"] ?? null);
+        yield "\"></canvas>
             </div>
           </div>
         </div>
@@ -116,7 +134,7 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
           <div class=\"card-body\">
             <div class=\"text-muted small\">Orders</div>
             <div class=\"fw-bold fs-4\">";
-        // line 40
+        // line 47
         yield ($context["kpi_orders"] ?? null);
         yield "</div>
           </div>
@@ -127,36 +145,31 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
           <div class=\"card-body\">
             <div class=\"text-muted small\">Average Order Value</div>
             <div class=\"fw-bold fs-4\">";
-        // line 48
+        // line 55
         yield ($context["kpi_aov_formatted"] ?? null);
         yield "</div>
           </div>
         </div>
       </div>
-      <div class=\"col-12 col-md-8\">
-        <div class=\"card\">
-          <div class=\"card-body\">
-            <canvas id=\"salesChart\" height=\"100\" data-chart-url=\"";
-        // line 55
-        yield ($context["chart_url"] ?? null);
-        yield "\"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
+      ";
+        // line 60
+        yield "    </div>
     <div class=\"row g-3 mb-3\">
       <div class=\"col-12 col-md-6\">
         <div class=\"card\">
           <div class=\"card-header d-flex justify-content-between align-items-center\">
             <span>";
-        // line 64
+        // line 65
         yield ($context["text_refunds"] ?? null);
         yield "</span>
-            <a href=\"#\" class=\"small text-decoration-none\">View Details</a>
+            <a href=\"#\" class=\"small text-decoration-none\">";
+        // line 66
+        yield ($context["text_view_details"] ?? null);
+        yield "</a>
           </div>
           <div class=\"card-body\">
             <canvas id=\"refundsChart\" height=\"120\" data-chart-url=\"";
-        // line 68
+        // line 69
         yield ($context["refunds_chart_url"] ?? null);
         yield "\"></canvas>
           </div>
@@ -166,14 +179,14 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
         <div class=\"card\">
           <div class=\"card-header d-flex justify-content-between align-items-center\">
             <span>";
-        // line 75
+        // line 76
         yield ($context["text_top_payment_methods"] ?? null);
         yield "</span>
             <a href=\"#\" class=\"small text-decoration-none\">View Details</a>
           </div>
           <div class=\"card-body\">
             <div id=\"topPayments\" data-url=\"";
-        // line 79
+        // line 80
         yield ($context["top_payments_url"] ?? null);
         yield "\"></div>
           </div>
@@ -199,7 +212,7 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
   })();
 </script>
 ";
-        // line 102
+        // line 103
         yield ($context["footer"] ?? null);
         yield "
 ";
@@ -227,7 +240,7 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  203 => 102,  177 => 79,  170 => 75,  160 => 68,  153 => 64,  141 => 55,  131 => 48,  120 => 40,  106 => 29,  102 => 28,  90 => 18,  79 => 16,  75 => 15,  70 => 13,  63 => 9,  59 => 8,  55 => 7,  51 => 6,  42 => 1,);
+        return array (  216 => 103,  190 => 80,  183 => 76,  173 => 69,  167 => 66,  163 => 65,  156 => 60,  149 => 55,  138 => 47,  126 => 38,  118 => 33,  114 => 32,  104 => 27,  100 => 26,  90 => 18,  79 => 16,  75 => 15,  70 => 13,  63 => 9,  59 => 8,  55 => 7,  51 => 6,  42 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -254,15 +267,22 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
   </div>
   <div class=\"container-fluid\">
     <div class=\"row g-3 mb-3\">
-      <div class=\"col-12 col-md-4\">
+      <div class=\"col-12\">
         <div class=\"card\">
+          <div class=\"card-header d-flex justify-content-between align-items-center\">
+            <span>{{ text_total_sales }}</span>
+            <a href=\"{{ details_url }}\" class=\"small text-decoration-none\">{{ text_view_details }}</a>
+          </div>
           <div class=\"card-body\">
-            <div class=\"d-flex justify-content-between align-items-center\">
-              <div>
-                <div class=\"text-muted small\">{{ text_total_sales }}</div>
-                <div class=\"fw-bold fs-4\" id=\"kpi-total\">{{ kpi_revenue_formatted }}</div>
+            <div class=\"d-flex justify-content-between align-items-center mb-3\">
+              <div class=\"d-flex align-items-baseline gap-3\">
+                <div class=\"fw-bold fs-3\" id=\"kpi-total\">{{ kpi_revenue_formatted }}</div>
+                <div class=\"text-success fw-semibold\">{{ kpi_revenue_percent }}%</div>
               </div>
               <i class=\"fa-solid fa-sack-dollar fa-2x text-primary\"></i>
+            </div>
+            <div style=\"height: 350px;\">
+              <canvas id=\"salesChart\" height=\"200\" data-chart-url=\"{{ chart_url }}\"></canvas>
             </div>
           </div>
         </div>
@@ -283,20 +303,14 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
           </div>
         </div>
       </div>
-      <div class=\"col-12 col-md-8\">
-        <div class=\"card\">
-          <div class=\"card-body\">
-            <canvas id=\"salesChart\" height=\"100\" data-chart-url=\"{{ chart_url }}\"></canvas>
-          </div>
-        </div>
-      </div>
+      {# Removed separate sales chart card since it's merged above #}
     </div>
     <div class=\"row g-3 mb-3\">
       <div class=\"col-12 col-md-6\">
         <div class=\"card\">
           <div class=\"card-header d-flex justify-content-between align-items-center\">
             <span>{{ text_refunds }}</span>
-            <a href=\"#\" class=\"small text-decoration-none\">View Details</a>
+            <a href=\"#\" class=\"small text-decoration-none\">{{ text_view_details }}</a>
           </div>
           <div class=\"card-body\">
             <canvas id=\"refundsChart\" height=\"120\" data-chart-url=\"{{ refunds_chart_url }}\"></canvas>
