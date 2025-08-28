@@ -167,9 +167,16 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
         yield ($context["text_view_details"] ?? null);
         yield "</a>
           </div>
-          <div class=\"card-body\">
-            <canvas id=\"refundsChart\" height=\"120\" data-chart-url=\"";
-        // line 69
+          <div class=\"d-flex justify-content-between align-items-center mb-3\"  style=\"padding-top: 10px;\">
+              <div class=\"d-flex align-items-baseline gap-3\">
+                <div class=\"fw-bold fs-3\" id=\"kpi-total-return\"></div>
+                <div class=\"text-success fw-semibold\"></div>
+              </div>
+              <i class=\"fa-solid fa-sack-dollar fa-2x text-primary\"></i>
+          </div>
+          <div class=\"card-body\" style=\"min-height: 300px;\">
+            <canvas id=\"refundsChart\" data-chart-url=\"";
+        // line 76
         yield ($context["refunds_chart_url"] ?? null);
         yield "\"></canvas>
           </div>
@@ -179,11 +186,11 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
         <div class=\"card\">
           <div class=\"card-header d-flex justify-content-between align-items-center\">
             <span>";
-        // line 76
+        // line 83
         yield ($context["text_top_payment_methods"] ?? null);
         yield "</span>
             <a href=\"";
-        // line 77
+        // line 84
         yield ($context["payments_details_url"] ?? null);
         yield "\" class=\"small text-decoration-none\">";
         yield ($context["text_view_details"] ?? null);
@@ -191,7 +198,7 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
           </div>
           <div class=\"card-body\" style=\"min-height: 150px;\">
             <div id=\"topPayments\" data-url=\"";
-        // line 80
+        // line 87
         yield ($context["top_payments_url"] ?? null);
         yield "\"></div>
           </div>
@@ -217,7 +224,7 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
   })();
 </script>
 ";
-        // line 103
+        // line 110
         yield ($context["footer"] ?? null);
         yield "
 ";
@@ -245,7 +252,7 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
      */
     public function getDebugInfo(): array
     {
-        return array (  221 => 103,  195 => 80,  187 => 77,  183 => 76,  173 => 69,  167 => 66,  163 => 65,  156 => 60,  149 => 55,  138 => 47,  126 => 38,  118 => 33,  114 => 32,  104 => 27,  100 => 26,  90 => 18,  79 => 16,  75 => 15,  70 => 13,  63 => 9,  59 => 8,  55 => 7,  51 => 6,  42 => 1,);
+        return array (  228 => 110,  202 => 87,  194 => 84,  190 => 83,  180 => 76,  167 => 66,  163 => 65,  156 => 60,  149 => 55,  138 => 47,  126 => 38,  118 => 33,  114 => 32,  104 => 27,  100 => 26,  90 => 18,  79 => 16,  75 => 15,  70 => 13,  63 => 9,  59 => 8,  55 => 7,  51 => 6,  42 => 1,);
     }
 
     public function getSourceContext(): Source
@@ -317,8 +324,15 @@ class __TwigTemplate_c976825e0a11322064ce244574b46822 extends Template
             <span>{{ text_refunds }}</span>
             <a href=\"#\" class=\"small text-decoration-none\">{{ text_view_details }}</a>
           </div>
-          <div class=\"card-body\">
-            <canvas id=\"refundsChart\" height=\"120\" data-chart-url=\"{{ refunds_chart_url }}\"></canvas>
+          <div class=\"d-flex justify-content-between align-items-center mb-3\"  style=\"padding-top: 10px;\">
+              <div class=\"d-flex align-items-baseline gap-3\">
+                <div class=\"fw-bold fs-3\" id=\"kpi-total-return\"></div>
+                <div class=\"text-success fw-semibold\"></div>
+              </div>
+              <i class=\"fa-solid fa-sack-dollar fa-2x text-primary\"></i>
+          </div>
+          <div class=\"card-body\" style=\"min-height: 300px;\">
+            <canvas id=\"refundsChart\" data-chart-url=\"{{ refunds_chart_url }}\"></canvas>
           </div>
         </div>
       </div>

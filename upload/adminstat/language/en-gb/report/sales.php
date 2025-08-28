@@ -1,7 +1,6 @@
 <?php
 $_['heading_title'] = 'Sales Report';
 $_['text_total_sales'] = 'Total Sales';
-$_['text_refunds'] = 'Refunds';
 $_['text_top_payment_methods'] = 'Top Payment Methods';
 $_['text_view_details'] = 'View Details';
 $_['text_export'] = 'Export';
@@ -17,4 +16,5 @@ $_['button_refresh'] = 'Refresh';
 $_['entry_date_start'] = 'Date Start';
 $_['entry_date_end'] = 'Date End';
 $_['column_payment_method'] = 'Payment Method';
+$_['text_refunds'] = 'Returns';
 

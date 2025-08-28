@@ -65,8 +65,15 @@
             <span>{{ text_refunds }}</span>
             <a href="#" class="small text-decoration-none">{{ text_view_details }}</a>
           </div>
-          <div class="card-body">
-            <canvas id="refundsChart" height="120" data-chart-url="{{ refunds_chart_url }}"></canvas>
+          <div class="d-flex justify-content-between align-items-center mb-3"  style="padding-top: 10px;">
+              <div class="d-flex align-items-baseline gap-3">
+                <div class="fw-bold fs-3" id="kpi-total-return"></div>
+                <div class="text-success fw-semibold"></div>
+              </div>
+              <i class="fa-solid fa-sack-dollar fa-2x text-primary"></i>
+          </div>
+          <div class="card-body" style="min-height: 300px;">
+            <canvas id="refundsChart" data-chart-url="{{ refunds_chart_url }}"></canvas>
           </div>
         </div>
       </div>

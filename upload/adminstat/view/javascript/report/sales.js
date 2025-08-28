@@ -51,6 +51,17 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!refundsUrl) return;
     try {
       const json = await fetchJson(refundsUrl);
+      // Update KPI just above the refunds chart
+      const totalEl = document.getElementById('kpi-total-return');
+      if (totalEl && typeof json.total_refund_formatted !== 'undefined') {
+        totalEl.textContent = json.total_refund_formatted;
+        // Find the sibling percent element within the same KPI wrapper
+        const kpiWrapper = totalEl.parentElement && totalEl.parentElement.parentElement ? totalEl.parentElement : null;
+        const percentEl = kpiWrapper ? kpiWrapper.querySelector('.text-success.fw-semibold') : null;
+        if (percentEl && typeof json.refund_percent !== 'undefined') {
+          percentEl.textContent = `${json.refund_percent}%`;
+        }
+      }
       refundsChartInstance = renderLineChart(refundsCanvas, json, refundsChartInstance);
     } catch (e) {
       console.error('Failed to load refunds chart', e);

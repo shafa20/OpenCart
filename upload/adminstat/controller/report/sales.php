@@ -100,7 +100,7 @@ class Sales extends \Opencart\System\Engine\Controller {
         $interval = strtolower($this->request->get['interval'] ?? 'day'); // day|month|year
         if (!in_array($interval, ['day', 'month', 'year'], true)) $interval = 'day';
 
-       
+
 
         $data['date_start'] = $date_start;
         $data['date_end'] = $date_end;
@@ -188,14 +188,14 @@ class Sales extends \Opencart\System\Engine\Controller {
 
         // Query aggregated by normalized payment method name
         $prefix = DB_PREFIX;
-        $sql = "SELECT 
-                    CASE 
+        $sql = "SELECT
+                    CASE
                         WHEN JSON_VALID(o.payment_method) THEN JSON_UNQUOTE(JSON_EXTRACT(o.payment_method, '$.name'))
                         ELSE o.payment_method
                     END AS name,
                     COUNT(*) AS orders,
                     SUM(o.total) AS total
-                FROM `{$prefix}order` o 
+                FROM `{$prefix}order` o
                 WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "'
                   AND o.order_status_id > 0
                 GROUP BY name
@@ -252,14 +252,14 @@ class Sales extends \Opencart\System\Engine\Controller {
         $date_start = $this->request->get['date_start'] ?? date('Y-m-d', strtotime('-29 days', strtotime($date_end)));
 
         $prefix = DB_PREFIX;
-        $sql = "SELECT 
-                    CASE 
+        $sql = "SELECT
+                    CASE
                         WHEN JSON_VALID(o.payment_method) THEN JSON_UNQUOTE(JSON_EXTRACT(o.payment_method, '$.name'))
                         ELSE o.payment_method
                     END AS name,
                     COUNT(*) AS orders,
                     SUM(o.total) AS total
-                FROM `{$prefix}order` o 
+                FROM `{$prefix}order` o
                 WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "'
                   AND o.order_status_id > 0
                 GROUP BY name
@@ -427,6 +427,7 @@ class Sales extends \Opencart\System\Engine\Controller {
      * Refunds over time (sum of negative order_total values) JSON
      */
     public function refundsChart(): void {
+        $this->load->language('report/sales');
         $date_end = $this->request->get['date_end'] ?? date('Y-m-d');
         $date_start = $this->request->get['date_start'] ?? date('Y-m-d', strtotime('-29 days', strtotime($date_end)));
 
@@ -441,12 +442,35 @@ class Sales extends \Opencart\System\Engine\Controller {
         }
 
         $prefix = DB_PREFIX;
-        // Using order_total table; refunds assumed as negative totals (credit/adjustments)
-        $sql = "SELECT DATE(o.date_added) AS d, SUM(ot.value) AS refund FROM `{$prefix}order` o JOIN `{$prefix}order_total` ot ON o.order_id = ot.order_id WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "' AND o.order_status_id > 0 AND ot.value < 0 GROUP BY DATE(o.date_added) ORDER BY d";
+        // Aggregate refunds by order's modified date, summing order totals for orders that have a return
+        $sql = "SELECT DATE(o.date_modified) AS d, SUM(o.total) AS refund
+                FROM `{$prefix}return` r
+                JOIN `{$prefix}order` o ON o.order_id = r.order_id
+                WHERE DATE(o.date_modified) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "'
+                GROUP BY DATE(o.date_modified)
+                ORDER BY d";
         $query = $this->db->query($sql);
         foreach ($query->rows as $row) {
-            $period[$row['d']] = abs((float)$row['refund']);
+            $period[$row['d']] = (float)$row['refund'];
         }
+
+        // Calculate total refund for selected range
+        $total_refund = array_sum($period);
+        $currency_code = $this->config->get('config_currency');
+        $total_refund_formatted = $this->currency->format($total_refund, $currency_code);
+
+        // Calculate overall total refund in database
+        $overall_sql = "SELECT GROUP_CONCAT(order_id) AS order_ids FROM `{$prefix}return`";
+        $overall_query = $this->db->query($overall_sql);
+        $overall_order_ids = $overall_query->row['order_ids'] ? explode(',', $overall_query->row['order_ids']) : [];
+        $overall_total_refund = 0.0;
+        if ($overall_order_ids) {
+            $overall_order_id_list = implode(',', array_map('intval', $overall_order_ids));
+            $overall_order_sql = "SELECT SUM(total) AS refund FROM `{$prefix}order` WHERE order_id IN ($overall_order_id_list)";
+            $overall_order_query = $this->db->query($overall_order_sql);
+            $overall_total_refund = (float)($overall_order_query->row['refund'] ?? 0.0);
+        }
+        $refund_percent = $overall_total_refund > 0 ? round(($total_refund / $overall_total_refund) * 100) : 0;
 
         $labels = [];
         $series = [];
@@ -464,7 +488,9 @@ class Sales extends \Opencart\System\Engine\Controller {
                 'backgroundColor' => 'rgba(32, 201, 151, 0.1)',
                 'tension' => 0.3,
                 'fill' => true
-            ]]
+            ]],
+            'total_refund_formatted' => $total_refund_formatted,
+            'refund_percent' => $refund_percent
         ];
 
         $this->response->addHeader('Content-Type: application/json');
@@ -481,17 +507,17 @@ class Sales extends \Opencart\System\Engine\Controller {
         $prefix = DB_PREFIX;
         // Some installations store payment_method as JSON like {"code":"cod.cod","name":"Cash On Delivery"}.
         // Normalize to the human-readable name and group by it to avoid duplicates.
-        $sql = "SELECT 
-                    CASE 
+        $sql = "SELECT
+                    CASE
                         WHEN JSON_VALID(o.payment_method) THEN JSON_UNQUOTE(JSON_EXTRACT(o.payment_method, '$.name'))
                         ELSE o.payment_method
                     END AS name,
                     SUM(o.total) AS total
-                FROM `{$prefix}order` o 
-                WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "' 
-                  AND o.order_status_id > 0 
-                GROUP BY name 
-                ORDER BY total DESC 
+                FROM `{$prefix}order` o
+                WHERE DATE(o.date_added) BETWEEN '" . $this->db->escape($date_start) . "' AND '" . $this->db->escape($date_end) . "'
+                  AND o.order_status_id > 0
+                GROUP BY name
+                ORDER BY total DESC
                 LIMIT 10";
         $rows = $this->db->query($sql)->rows;
 
